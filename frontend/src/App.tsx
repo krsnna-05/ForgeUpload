@@ -1,7 +1,13 @@
+import { Topbar } from "./components";
+
 const App = () => {
   return (
-    <div>
-      <p className=" bg-red-200">This is react project</p>
+    <div className="min-h-screen bg-gray-50">
+      <Topbar />
+
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Content goes here */}
+      </main>
     </div>
   );
 };
