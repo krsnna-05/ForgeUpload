@@ -1,4 +1,5 @@
 import { Upload } from "lucide-react";
+import { ModeToggle } from "./mode-toggle";
 
 export const Topbar = () => {
   return (
@@ -12,11 +13,14 @@ export const Topbar = () => {
           <h1 className="text-xl font-semibold text-foreground">ForgeUpload</h1>
         </div>
 
-        {/* Right - Upload Button */}
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-primary-foreground rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md">
-          <Upload size={18} />
-          <span>Upload</span>
-        </button>
+        {/* Right - Upload Button & Theme Toggle */}
+        <div className="flex items-center gap-3">
+          <ModeToggle />
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-primary-foreground rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md">
+            <Upload size={18} />
+            <span>Upload</span>
+          </button>
+        </div>
       </div>
     </header>
   );
