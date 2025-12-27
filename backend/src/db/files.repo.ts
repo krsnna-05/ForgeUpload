@@ -10,71 +10,65 @@ export interface BasicFileRecord {
 }
 
 class FilesRepo {
-  async createFileRecord(file: BasicFileRecord): Promise<void> {
-    const query = `
+  // CREATE
+  async create(file: BasicFileRecord): Promise<void> {
+    await pool.query(
+      `
       INSERT INTO files (id, original_name, stored_path, mime_type, size)
       VALUES ($1, $2, $3, $4, $5)
-    `;
-    const values = [
-      file.id,
-      file.originalName,
-      file.storedPath,
-      file.mimeType,
-      file.size,
-    ];
-
-    const res = await pool.query(query, values);
-
-    console.log("File record created:", res);
+      `,
+      [file.id, file.originalName, file.storedPath, file.mimeType, file.size]
+    );
   }
 
-  async getFileById(id: string): Promise<BasicFileRecord | null> {
-    const query = `
-      SELECT id, original_name, stored_path, mime_type, size
+  // READ (single)
+  async getById(id: string): Promise<BasicFileRecord | null> {
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        original_name AS "originalName",
+        stored_path AS "storedPath",
+        mime_type AS "mimeType",
+        size,
+        created_at AS "createdAt"
       FROM files
       WHERE id = $1
-    `;
-    const values = [id];
+      `,
+      [id]
+    );
 
-    const result = await pool.query(query, values);
-
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    return result.rows[0] as BasicFileRecord;
+    return result.rows[0] ?? null;
   }
 
-  async getFiles(page: number, limit: number): Promise<BasicFileRecord[]> {
-    const offset = (page - 1) * limit;
-    const query = `
-      SELECT id, original_name, stored_path, mime_type, size
+  // READ (paginated)
+  async list(page: number, limit: number): Promise<BasicFileRecord[]> {
+    const safeLimit = Math.min(Math.max(limit, 1), 50);
+    const safePage = Math.max(page, 1);
+    const offset = (safePage - 1) * safeLimit;
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        original_name AS "originalName",
+        stored_path AS "storedPath",
+        mime_type AS "mimeType",
+        size,
+        created_at AS "createdAt"
       FROM files
       ORDER BY created_at DESC
       LIMIT $1 OFFSET $2
-    `;
-    const values = [limit, offset];
+      `,
+      [safeLimit, offset]
+    );
 
-    const result = await pool.query(query, values);
-
-    return result.rows as BasicFileRecord[];
+    return result.rows;
   }
 
-  async deleteFileById(id: string): Promise<BasicFileRecord> {
-    const fileRecord = await this.getFileById(id);
-    if (!fileRecord) {
-      throw new Error("File record not found");
-    }
-
-    const query = `
-        DELETE FROM files
-        WHERE id = $1
-    `;
-    const values = [id];
-
-    await pool.query(query, values);
-
-    return fileRecord;
+  // DELETE (DB only)
+  async deleteById(id: string): Promise<void> {
+    await pool.query("DELETE FROM files WHERE id = $1", [id]);
   }
 }
 
