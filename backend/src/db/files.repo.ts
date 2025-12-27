@@ -60,7 +60,12 @@ class FilesRepo {
     return result.rows as BasicFileRecord[];
   }
 
-  async deleteFileById(id: string): Promise<void> {
+  async deleteFileById(id: string): Promise<BasicFileRecord> {
+    const fileRecord = await this.getFileById(id);
+    if (!fileRecord) {
+      throw new Error("File record not found");
+    }
+
     const query = `
         DELETE FROM files
         WHERE id = $1
@@ -68,6 +73,8 @@ class FilesRepo {
     const values = [id];
 
     await pool.query(query, values);
+
+    return fileRecord;
   }
 }
 
