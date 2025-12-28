@@ -8,6 +8,7 @@ const allowedMimeTypesFiles = [
   "image/jpeg",
   "image/png",
   "image/webp",
+  "image/dng",
   "application/pdf",
   "text/plain",
 ];

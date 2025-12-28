@@ -55,6 +55,21 @@ const UploadBox = () => {
       }
     };
 
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        console.log("Files uploaded successfully");
+
+        window.location.reload(); // OK for now
+      } else {
+        console.error("Upload failed:", xhr.responseText);
+      }
+    };
+
+    // network error
+    xhr.onerror = () => {
+      console.error("Network error during upload");
+    };
+
     xhr.send(formData);
   };
 
