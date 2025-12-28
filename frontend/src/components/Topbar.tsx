@@ -1,5 +1,7 @@
 import { Upload } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
+import { Drawer, DrawerTrigger } from "./ui/drawer";
+import UploadBox from "./home/UploadBox";
 
 export const Topbar = () => {
   return (
@@ -16,10 +18,16 @@ export const Topbar = () => {
         {/* Right - Upload Button & Theme Toggle */}
         <div className="flex items-center gap-3">
           <ModeToggle />
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-primary-foreground rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md">
-            <Upload size={18} />
-            <span>Upload</span>
-          </button>
+
+          <Drawer>
+            <DrawerTrigger>
+              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-primary-foreground rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md">
+                <Upload size={18} />
+                <span>Upload</span>
+              </button>
+            </DrawerTrigger>
+            <UploadBox />
+          </Drawer>
         </div>
       </div>
     </header>

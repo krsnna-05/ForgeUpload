@@ -1,4 +1,5 @@
 import { Topbar } from "./components/Topbar";
+import Uploads from "./components/home/Uploads";
 import { ThemeProvider } from "./components/theme-provider";
 
 const App = () => {
@@ -7,8 +8,8 @@ const App = () => {
       <div className=" min-h-screen bg-background text-foreground">
         <Topbar />
 
-        <main className="max-w-7xl mx-auto px-6 py-12">
-          {/* Content goes here */}
+        <main className=" mx-auto px-6 py-3">
+          <Uploads />
         </main>
       </div>
     </ThemeProvider>
