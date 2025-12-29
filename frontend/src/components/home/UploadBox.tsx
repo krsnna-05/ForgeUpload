@@ -114,7 +114,7 @@ const UploadBox = () => {
         <Separator orientation="horizontal" className="w-24 block lg:hidden" />
         <div className="flex-1 flex flex-col items-center justify-center gap-3 border border-dashed border-border/50 rounded-lg p-8 bg-muted/30">
           <Dropzone
-            maxSize={1024 * 1024 * 10}
+            maxSize={1024 * 1024 * 100}
             minSize={1024}
             onDrop={handleDrop}
             onError={console.error}

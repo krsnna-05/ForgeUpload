@@ -9,6 +9,8 @@ interface UploadCardProps {
   size: number;
   type: "file" | "video";
   thumbnailUrl?: string;
+  status?: "uploading" | "completed" | "failed";
+  progress: number;
 }
 
 const formatSize = (bytes: number) => {
@@ -25,24 +27,10 @@ const UploadCard = ({
   size,
   type,
   thumbnailUrl,
+  status,
+  progress,
 }: UploadCardProps) => {
   const { deleteFile } = useFileStore();
-
-  const handleDelete = async (id: string) => {
-    const deleteURI = `/api/upload/files/${id}`;
-
-    const res = await fetch(deleteURI, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      console.log("File deleted successfully");
-
-      deleteFile(id);
-    } else {
-      console.error("Failed to delete file");
-    }
-  };
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -86,21 +74,66 @@ const UploadCard = ({
             {name}
           </p>
           <p className="text-xs text-muted-foreground">{formatSize(size)}</p>
-        </div>
 
-        {/* Actions */}
-        <div className="flex gap-2 pt-2 border-t border-border/20">
-          <Button className="flex-1 ">View</Button>
-          <Button
-            className=""
-            variant={"destructive"}
-            onClick={() => handleDelete(id)}
-          >
-            <TrashIcon />
-          </Button>
+          {status == "uploading" ? (
+            <ProgressBar progress={progress} />
+          ) : (
+            <ViewAndDeleteButton id={id} />
+          )}
         </div>
       </div>
     </Card>
+  );
+};
+
+const ViewAndDeleteButton = ({ id }: { id: string }) => {
+  const { deleteFile } = useFileStore();
+
+  const handleDelete = async (id: string) => {
+    const deleteURI = `/api/upload/files/${id}`;
+
+    const res = await fetch(deleteURI, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      console.log("File deleted successfully");
+
+      deleteFile(id);
+    } else {
+      console.error("Failed to delete file");
+    }
+  };
+
+  return (
+    <div className="flex gap-2 pt-2 border-t border-border/20">
+      <Button className="flex-1 ">View</Button>
+      <Button
+        className=""
+        variant={"destructive"}
+        onClick={() => handleDelete(id)}
+      >
+        <TrashIcon />
+      </Button>
+    </div>
+  );
+};
+
+const ProgressBar = ({ progress }: { progress: number }) => {
+  console.log("hello form progress bar");
+
+  return (
+    <div className=" flex items-center justify-center mt-3 w-full gap-3">
+      <div className=" bg-muted-foreground flex-1 h-4 relative rounded-full ">
+        <div
+          className=" bg-blue-500 h-full rounded-full"
+          style={{
+            width: `${progress}%`,
+          }}
+        ></div>
+      </div>
+      <p className="">{progress}%</p>
+    </div>
   );
 };
 
