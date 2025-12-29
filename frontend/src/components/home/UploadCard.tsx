@@ -120,13 +120,11 @@ const ViewAndDeleteButton = ({ id }: { id: string }) => {
 };
 
 const ProgressBar = ({ progress }: { progress: number }) => {
-  console.log("hello form progress bar");
-
   return (
     <div className=" flex items-center justify-center mt-3 w-full gap-3">
-      <div className=" bg-muted-foreground flex-1 h-4 relative rounded-full ">
+      <div className=" bg-muted flex-1 h-4 relative rounded-full ">
         <div
-          className=" bg-blue-500 h-full rounded-full"
+          className=" bg-muted-foreground h-full rounded-full transition-all"
           style={{
             width: `${progress}%`,
           }}

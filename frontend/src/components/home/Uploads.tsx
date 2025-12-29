@@ -37,17 +37,10 @@ const Uploads = () => {
               name={upload.originalName}
               size={upload.size}
               type={upload.mimeType}
-              status="completed"
+              status={upload.status}
+              progress={upload.progress || 0}
             />
           ))}
-          <UploadCard
-            key={"hellohgishdho"}
-            id={"hodhohgiohsd"}
-            name="testImg"
-            size={1024 * 1024 * 5}
-            status="uploading"
-            progress={80}
-          />
         </div>
       )}
     </div>

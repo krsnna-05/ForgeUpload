@@ -7,80 +7,100 @@ import {
 } from "@/components/ui/drawer";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 import { Separator } from "../ui/separator";
-import { FilesIcon, VideoIcon, Upload } from "lucide-react";
+import { FilesIcon, VideoIcon } from "lucide-react";
 import {
   Dropzone,
   DropzoneContent,
   DropzoneEmptyState,
 } from "../ui/shadcn-io/dropzone";
 import useFileStore from "@/store/filestore";
+import { useState } from "react";
+import { v4 as uuid } from "uuid";
 
 const UploadBox = () => {
   const [uploadType, setUploadType] = useState<"file" | "video">("file");
 
-  const [files, setFiles] = useState<File[] | undefined>();
+  const { addFile, updateProgress, deleteFile } = useFileStore();
 
-  const { addFile } = useFileStore();
+  /**
+   * One call = one upload job
+   * This enables parallel uploads
+   */
+  const startUpload = (file: File) => {
+    const id = uuid();
 
-  useEffect(() => {
-    console.log("Files selected:", files);
-  }, [files]);
-
-  const handleDrop = (files: File[]) => {
-    console.log(files);
-    setFiles(files);
-  };
-
-  const onProgress = (progress: number) => {
-    console.log(`Upload progress: ${progress}%`);
-  };
-
-  const handleUpload = (onProgress: (n: number) => void) => {
-    if (!files || files.length === 0) {
-      return;
-    }
-
-    const formData = new FormData();
-
-    files.forEach((file) => {
-      formData.append("basicFiles", file);
+    // 1️⃣ Add uploading file to store
+    addFile({
+      id,
+      originalName: file.name,
+      size: file.size,
+      mimeType: uploadType,
+      status: "uploading",
+      progress: 0,
     });
 
+    // 2️⃣ Create independent XHR
     const xhr = new XMLHttpRequest();
+    const formData = new FormData();
 
-    xhr.open("POST", "/api/upload/files");
+    formData.append("basicFiles", file);
+    xhr.open("POST", "http://10.22.48.204:3000/api/upload/files");
 
+    // 3️⃣ Progress updates
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
-        onProgress((e.loaded / e.total) * 100);
+        updateProgress(id, Math.round((e.loaded / e.total) * 100));
       }
     };
 
+    // 4️⃣ Success / failure
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        console.log("Files uploaded successfully");
+        // We cannot update status directly (store limitation)
+        deleteFile(id);
 
-        const res = JSON.parse(xhr.responseText);
+        const res = JSON.parse(xhr.response);
 
         addFile({
           id: res.file.id,
-          originalName: res.file.originalName,
-          size: res.file.size,
-          mimeType: res.file.mimeType,
+          originalName: file.name,
+          size: file.size,
+          mimeType: uploadType,
+          status: "completed",
+          progress: 100,
         });
       } else {
-        console.error("Upload failed:", xhr.responseText);
+        deleteFile(id);
+        addFile({
+          id,
+          originalName: file.name,
+          size: file.size,
+          mimeType: uploadType,
+          status: "failed",
+          progress: 0,
+        });
       }
     };
 
-    // network error
     xhr.onerror = () => {
-      console.error("Network error during upload");
+      deleteFile(id);
+      addFile({
+        id,
+        originalName: file.name,
+        size: file.size,
+        mimeType: uploadType,
+        status: "failed",
+        progress: 0,
+      });
     };
 
     xhr.send(formData);
+  };
+
+  const handleDrop = (files: File[]) => {
+    if (!files || files.length === 0) return;
+    startUpload(files[0]);
   };
 
   return (
@@ -93,52 +113,44 @@ const UploadBox = () => {
           Select the type and upload to cloud
         </DrawerDescription>
       </DrawerHeader>
+
       <div className="flex flex-col lg:flex-row justify-center items-center h-full gap-6 max-w-xl mx-auto w-full">
         <div className="flex lg:flex-col gap-3">
           <Button
             variant={uploadType === "file" ? "default" : "outline"}
-            className="h-10 px-4 rounded-lg font-medium transition-all"
             onClick={() => setUploadType("file")}
           >
             <FilesIcon /> Files
           </Button>
+
           <Button
             variant={uploadType === "video" ? "default" : "outline"}
-            className="h-10 px-4 rounded-lg font-medium transition-all"
             onClick={() => setUploadType("video")}
           >
             <VideoIcon /> Video
           </Button>
         </div>
+
         <Separator orientation="vertical" className="h-24 hidden lg:block" />
         <Separator orientation="horizontal" className="w-24 block lg:hidden" />
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 border border-dashed border-border/50 rounded-lg p-8 bg-muted/30">
+
+        <div className="flex-1 border border-dashed rounded-lg p-8 bg-muted/30">
           <Dropzone
             maxSize={1024 * 1024 * 100}
             minSize={1024}
             onDrop={handleDrop}
             onError={console.error}
-            src={files}
           >
             <DropzoneEmptyState />
             <DropzoneContent />
           </Dropzone>
         </div>
       </div>
-      <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border/30">
+
+      <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
         <DrawerClose>
-          <Button variant="outline" className="rounded-lg font-medium">
-            Cancel
-          </Button>
+          <Button variant="outline">Cancel</Button>
         </DrawerClose>
-        <Button
-          disabled={!files || files.length === 0}
-          className="rounded-lg font-medium gap-2"
-          onClick={() => handleUpload(onProgress)}
-        >
-          <Upload size={16} />
-          Upload
-        </Button>
       </div>
     </DrawerContent>
   );

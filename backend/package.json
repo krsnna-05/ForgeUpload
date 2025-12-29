@@ -28,6 +28,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.5",
     "multer": "^2.0.2",
     "pg": "^8.16.3"
   }
