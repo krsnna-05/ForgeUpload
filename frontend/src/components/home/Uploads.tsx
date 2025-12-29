@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import UploadCard from "./UploadCard";
+import useFileStore from "@/store/filestore";
 
 const Uploads = () => {
-  const [uploads, setUploads] = useState<any[]>([]);
+  const { setFiles, files } = useFileStore();
 
   const fetchUploads = async () => {
     // Fetch uploads logic here
@@ -13,7 +14,7 @@ const Uploads = () => {
 
     const uploadData = data.data;
 
-    setUploads(uploadData);
+    setFiles(uploadData);
   };
 
   useEffect(() => {
@@ -23,13 +24,13 @@ const Uploads = () => {
   return (
     <div>
       <Header />
-      {uploads.length === 0 ? (
+      {files.length === 0 ? (
         <p className="p-4 text-center text-muted-foreground">
           No uploads found.
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {uploads.map((upload) => (
+          {files.map((upload) => (
             <UploadCard
               key={upload.id}
               id={upload.id}

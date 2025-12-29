@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { FileIcon, VideoIcon, MoreVertical, TrashIcon } from "lucide-react";
+import { FileIcon, VideoIcon, TrashIcon } from "lucide-react";
 
 interface UploadCardProps {
   id: string;
