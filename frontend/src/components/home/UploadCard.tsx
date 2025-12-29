@@ -1,3 +1,4 @@
+import useFileStore from "@/store/filestore";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { FileIcon, VideoIcon, TrashIcon } from "lucide-react";
@@ -25,6 +26,8 @@ const UploadCard = ({
   type,
   thumbnailUrl,
 }: UploadCardProps) => {
+  const { deleteFile } = useFileStore();
+
   const handleDelete = async (id: string) => {
     const deleteURI = `/api/upload/files/${id}`;
 
@@ -34,7 +37,8 @@ const UploadCard = ({
 
     if (res.ok) {
       console.log("File deleted successfully");
-      window.location.reload();
+
+      deleteFile(id);
     } else {
       console.error("Failed to delete file");
     }

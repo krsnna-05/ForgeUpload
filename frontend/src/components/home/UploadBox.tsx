@@ -15,11 +15,14 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from "../ui/shadcn-io/dropzone";
+import useFileStore from "@/store/filestore";
 
 const UploadBox = () => {
   const [uploadType, setUploadType] = useState<"file" | "video">("file");
 
   const [files, setFiles] = useState<File[] | undefined>();
+
+  const { addFile } = useFileStore();
 
   useEffect(() => {
     console.log("Files selected:", files);
@@ -59,7 +62,14 @@ const UploadBox = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         console.log("Files uploaded successfully");
 
-        window.location.reload(); // OK for now
+        const res = JSON.parse(xhr.responseText);
+
+        addFile({
+          id: res.file.id,
+          originalName: res.file.originalName,
+          size: res.file.size,
+          mimeType: res.file.mimeType,
+        });
       } else {
         console.error("Upload failed:", xhr.responseText);
       }

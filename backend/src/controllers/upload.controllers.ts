@@ -16,9 +16,10 @@ export const filesUploadController = async (
       message: "No file uploaded",
     });
   }
+  const id = randomUUID();
 
   await filesRepo.create({
-    id: randomUUID(),
+    id: id,
     originalName: req.file.originalname,
     storedPath: req.file.path,
     mimeType: req.file.mimetype,
@@ -28,6 +29,12 @@ export const filesUploadController = async (
   return res.status(201).json({
     success: true,
     message: "File uploaded successfully",
+    file: {
+      id: id,
+      originalName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      size: req.file.size,
+    },
   });
 };
 
