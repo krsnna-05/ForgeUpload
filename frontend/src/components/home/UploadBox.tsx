@@ -45,7 +45,7 @@ const UploadBox = () => {
     const formData = new FormData();
 
     formData.append("basicFiles", file);
-    xhr.open("POST", "http://192.168.1.103:3000/api/upload/files");
+    xhr.open("POST", "http://10.214.79.37:3000/api/upload/files");
 
     // 3️⃣ Progress updates
     xhr.upload.onprogress = (e) => {

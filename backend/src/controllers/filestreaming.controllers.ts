@@ -40,9 +40,19 @@ const fileStreaming = (req: Request, res: Response, filePath: string) => {
 };
 
 export const fileStreamingController = (req: Request, res: Response) => {
-  const { filePath } = req.body;
+  const filePath = req.query.filePath as string;
+
+  if (!filePath) {
+    res.status(400).json({ error: "filePath query parameter is required" });
+    return;
+  }
 
   console.log("Streaming file:", filePath);
 
-  fileStreaming(req, res, filePath);
+  try {
+    fileStreaming(req, res, filePath);
+  } catch (error) {
+    console.error("Error streaming file:", error);
+    res.status(500).json({ error: "Failed to stream file" });
+  }
 };

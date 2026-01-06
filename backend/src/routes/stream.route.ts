@@ -3,6 +3,6 @@ import { fileStreamingController } from "../controllers/filestreaming.controller
 
 const streamRouter = Router();
 
-streamRouter.post("/file", fileStreamingController);
+streamRouter.get("/file", fileStreamingController);
 
 export default streamRouter;

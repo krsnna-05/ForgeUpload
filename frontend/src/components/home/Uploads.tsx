@@ -39,6 +39,7 @@ const Uploads = () => {
               type={upload.mimeType}
               status={upload.status}
               progress={upload.progress || 0}
+              thumbnailUrl={`http://10.214.79.37:3000/api/stream/file?filePath=${upload.storedPath}`}
             />
           ))}
         </div>
