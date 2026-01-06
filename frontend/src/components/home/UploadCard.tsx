@@ -2,6 +2,9 @@ import useFileStore from "@/store/filestore";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { FileIcon, VideoIcon, TrashIcon } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import ImgViewer from "./ImgViewer";
 
 interface UploadCardProps {
   id: string;
@@ -78,7 +81,11 @@ const UploadCard = ({
           {status == "uploading" ? (
             <ProgressBar progress={progress} />
           ) : (
-            <ViewAndDeleteButton id={id} />
+            <ViewAndDeleteButton
+              id={id}
+              thumbnailUrl={thumbnailUrl}
+              name={name}
+            />
           )}
         </div>
       </div>
@@ -86,8 +93,17 @@ const UploadCard = ({
   );
 };
 
-const ViewAndDeleteButton = ({ id }: { id: string }) => {
+const ViewAndDeleteButton = ({
+  id,
+  thumbnailUrl,
+  name,
+}: {
+  id: string;
+  thumbnailUrl?: string;
+  name: string;
+}) => {
   const { deleteFile } = useFileStore();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDelete = async (id: string) => {
     const deleteURI = `/api/upload/files/${id}`;
@@ -107,7 +123,14 @@ const ViewAndDeleteButton = ({ id }: { id: string }) => {
 
   return (
     <div className="flex gap-2 pt-2 border-t border-border/20">
-      <Button className="flex-1 ">View</Button>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button className="flex-1">View</Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl w-full" showCloseButton={true}>
+          {thumbnailUrl && <ImgViewer imgUrl={thumbnailUrl} altText={name} />}
+        </DialogContent>
+      </Dialog>
       <Button
         className=""
         variant={"destructive"}

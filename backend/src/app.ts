@@ -2,6 +2,7 @@ import express from "express";
 import uploadRouter from "./routes/upload.route";
 import errorMiddleware from "./middlewares/error.middleware";
 import cors from "cors";
+import streamRouter from "./routes/stream.route";
 const app = express();
 app.use(express.json());
 app.use(
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/upload", uploadRouter);
+app.use("/api/stream", streamRouter);
 
 app.use(errorMiddleware);
 
